@@ -604,38 +604,41 @@ mgaComposite(PixmapPtr pDst, int srcx, int srcy, int maskx, int masky,
 {
     PMGA(pDst);
     PictTransformPtr t;
+    PictVector v;
     int texctl2;
-
-    srcx %= pMga->currentSrc->drawable.width;
-    srcy %= pMga->currentSrc->drawable.height;
-
-    if (pMga->currentMask) {
-        maskx %= pMga->currentMask->drawable.width;
-        masky %= pMga->currentMask->drawable.height;
-    }
 
     t = pMga->currentSrcPicture->transform;
 
-    if (t)
+    if (t) {
+        v.vector[0] = IntToxFixed (srcx);
+        v.vector[1] = IntToxFixed (srcy);
+        v.vector[2] = xFixed1;
+
+        PictureTransformPoint(t, &v);
+
         setTMIncrementsRegs(pMga,
                             t->matrix[0][0],
                             t->matrix[0][1],
-                            t->matrix[0][2] + (srcx << 16),
+                            v.vector[0],
                             t->matrix[1][0],
                             t->matrix[1][1],
-                            t->matrix[1][2] + (srcy << 16),
+                            v.vector[1],
                             t->matrix[2][0],
                             t->matrix[2][1],
                             t->matrix[2][2],
                             4 - pMga->src_w2,
                             4 - pMga->src_h2);
-    else
+    } else {
+        srcx %= pMga->currentSrc->drawable.width;
+        srcy %= pMga->currentSrc->drawable.height;
+
         setTMIncrementsRegs(pMga,
                             1 << 16, 0, srcx << 16,
                             0, 1 << 16, srcy << 16,
                             0, 0, 1 << 16,
                             4 - pMga->src_w2,
                             4 - pMga->src_h2);
+    }
 
     if (pMga->currentMask) {
         texctl2 = MGA_G400_TC2_MAGIC | MGA_TC2_CKSTRANSDIS | MGA_TC2_DUALTEX;
@@ -645,26 +648,36 @@ mgaComposite(PixmapPtr pDst, int srcx, int srcy, int maskx, int masky,
 
         t = pMga->currentMaskPicture->transform;
 
-        if (t)
+        if (t) {
+            v.vector[0] = IntToxFixed (maskx);
+            v.vector[1] = IntToxFixed (masky);
+            v.vector[2] = xFixed1;
+
+            PictureTransformPoint(t, &v);
+
             setTMIncrementsRegs(pMga,
                                 t->matrix[0][0],
                                 t->matrix[0][1],
-                                t->matrix[0][2] + (maskx << 16),
+                                v.vector[0],
                                 t->matrix[1][0],
                                 t->matrix[1][1],
-                                t->matrix[1][2] + (masky << 16),
+                                v.vector[1],
                                 t->matrix[2][0],
                                 t->matrix[2][1],
                                 t->matrix[2][2],
                                 4 - pMga->mask_w2,
                                 4 - pMga->mask_h2);
-        else
+        } else {
+            maskx %= pMga->currentMask->drawable.width;
+            masky %= pMga->currentMask->drawable.height;
+
             setTMIncrementsRegs(pMga,
                                 1 << 16, 0, maskx << 16,
                                 0, 1 << 16, masky << 16,
                                 0, 0, 1 << 16,
                                 4 - pMga->mask_w2,
                                 4 - pMga->mask_h2);
+        }
 
         WAITFIFO(1);
         OUTREG(MGAREG_TEXCTL2, texctl2 & ~MGA_TC2_SELECT_TMU1);
