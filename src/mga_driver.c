@@ -2767,18 +2767,10 @@ MGAMapMem(ScrnInfoPtr pScrn)
 	if (pMga->IOBase == NULL)
 	    return FALSE;
 
-    if (pMga->is_G200ER)
-    {
         pMga->FbBase = xf86MapPciMem(pScrn->scrnIndex, VIDMEM_FRAMEBUFFER,
                          pMga->PciTag, pMga->FbAddress,
                          pMga->FbMapSize);
-    }
-    else
-    {
-        pMga->FbBase = xf86MapPciMem(pScrn->scrnIndex, VIDMEM_FRAMEBUFFER,
-                         pMga->PciTag, pMga->FbAddress,
-                         pMga->FbMapSize);
-    }
+
 	if (pMga->FbBase == NULL)
 	    return FALSE;
 #endif
