@@ -377,9 +377,6 @@ MGAPreInitMergedFB(ScrnInfoPtr pScrn1, int flags)
 
     mga_read_and_process_bios( pScrn );
 
-    /* HW bpp matches reported bpp */
-    pMga->HwBpp = pMga1->HwBpp;
-
     /*
      * Reset card if it isn't primary one
      */

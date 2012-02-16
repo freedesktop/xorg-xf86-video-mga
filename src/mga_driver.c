@@ -2047,10 +2047,6 @@ MGAPreInit(ScrnInfoPtr pScrn, int flags)
         }
     }
 
-
-    /* HW bpp matches reported bpp */
-    pMga->HwBpp = pScrn->bitsPerPixel;
-
     /*
      * Reset card if it isn't primary one
      */

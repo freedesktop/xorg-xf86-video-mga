@@ -473,7 +473,6 @@ typedef struct {
 
     Bool		Primary;
     Bool		Interleave;
-    int			HwBpp;
     int			Roundings[4];
     int			BppShifts[4];
     Bool		HasFBitBlt;
@@ -594,8 +593,6 @@ typedef struct {
     MGAConfigPrivPtr 	pVisualConfigsPriv;
     MGADRIServerPrivatePtr DRIServerInfo;
 
-    MGARegRec		DRContextRegs;
-
     Bool		haveQuiescense;
     void		(*GetQuiescence)(ScrnInfoPtr pScrn);
 
@@ -658,7 +655,6 @@ typedef struct {
     ScrnInfoPtr       pScrn2; /*pointer to second CRTC screeninforec,
                                        if in merged mode */
 /* End of Merged Framebuffer Data */
-  int			HALGranularityOffX, HALGranularityOffY;
 } MGARec, *MGAPtr;
 
 extern CARD32 MGAAtype[16];
