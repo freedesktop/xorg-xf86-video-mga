@@ -568,8 +568,6 @@ typedef struct {
     void		(*PointerMoved)(SCRN_ARG_TYPE arg, int x, int y);
     CloseScreenProcPtr	CloseScreen;
     ScreenBlockHandlerProcPtr BlockHandler;
-    unsigned int	(*ddc1Read)(ScrnInfoPtr);
-    void (*DDC1SetSpeed)(ScrnInfoPtr, xf86ddcSpeed);
     Bool		(*i2cInit)(ScrnInfoPtr);
     I2CBusPtr		DDC_Bus1;
     I2CBusPtr		DDC_Bus2;

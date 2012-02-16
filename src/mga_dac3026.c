@@ -956,22 +956,6 @@ MGA3026UseHWCursor(ScreenPtr pScrn, CursorPtr pCurs)
 static const int DDC_SDA_MASK = 1 << 2;
 static const int DDC_SCL_MASK = 1 << 4;
 
-static unsigned int
-MGA3026_ddc1Read(ScrnInfoPtr pScrn)
-{
-  MGAPtr pMga = MGAPTR(pScrn);
-
-  /* Define the SDA as an input */
-  outTi3026(TVP3026_GEN_IO_CTL, 0xfb, 0);
-
-  /* wait for Vsync */
-  while( INREG( MGAREG_Status ) & 0x08 );
-  while( ! (INREG( MGAREG_Status ) & 0x08) );
-
-  /* Get the result */
-  return (inTi3026(TVP3026_GEN_IO_DATA) & DDC_SDA_MASK) >> 2 ;
-}
-
 static void
 MGA3026_I2CGetBits(I2CBusPtr b, int *clock, int *data) 
 {
@@ -1181,8 +1165,5 @@ void MGA2064SetupFuncs(ScrnInfoPtr pScrn)
     pMga->Save = MGA3026Save;
     pMga->Restore = MGA3026Restore;
     pMga->ModeInit = MGA3026Init;
-    pMga->ddc1Read = MGA3026_ddc1Read;
-    /* vgaHWddc1SetSpeed will only work if the card is in VGA mode */
-    pMga->DDC1SetSpeed = vgaHWddc1SetSpeedWeak();
     pMga->i2cInit = MGA3026_i2cInit;
 }

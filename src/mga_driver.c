@@ -1244,11 +1244,9 @@ MGAdoDDC(ScrnInfoPtr pScrn)
     pMga = MGAPTR(pScrn);
 
     /* Load DDC if we have the code to use it */
-    /* This gives us DDC1 */
-    if (pMga->ddc1Read || pMga->i2cInit) {
+    if (pMga->i2cInit) {
 	if (!xf86LoadSubModule(pScrn, "ddc")) {
 	    /* ddc module not found, we can do without it */
-	    pMga->ddc1Read = NULL;
 	    pMga->DDC_Bus1 = NULL;
 	    pMga->DDC_Bus2 = NULL;
 	    return NULL;
@@ -1280,13 +1278,6 @@ MGAdoDDC(ScrnInfoPtr pScrn)
 	hwp->MapSize = 0x10000;
 	if (!vgaHWMapMem(pScrn))
 	    return NULL;
-    } else {
-	/* XXX Need to write an MGA mode ddc1SetSpeed */
-	if (pMga->DDC1SetSpeed == vgaHWddc1SetSpeedWeak()) {
-	    pMga->DDC1SetSpeed = NULL;
-	    xf86DrvMsgVerb(pScrn->scrnIndex, X_INFO, 2,
-			   "DDC1 disabled - chip not in VGA mode\n");
-	}
     }
 
     /* Save the current state */
@@ -1314,14 +1305,6 @@ MGAdoDDC(ScrnInfoPtr pScrn)
 	    MonInfo = xf86DoEDID_DDC2(XF86_SCRN_ARG(pScrn), pMga->DDC_Bus1);
 	    from = "I2C";
 	}
-	if (!MonInfo)
-	    /* Read and output monitor info using DDC1 */
-	    if (pMga->ddc1Read && pMga->DDC1SetSpeed) {
-		MonInfo = xf86DoEDID_DDC1(XF86_SCRN_ARG(pScrn),
-					  pMga->DDC1SetSpeed,
-					  pMga->ddc1Read ) ;
-		from = "DDC1";
-	    }
 	if (!MonInfo){
 	    vbeInfoPtr pVbe;
 	    if (xf86LoadSubModule(pScrn, "vbe")) {
