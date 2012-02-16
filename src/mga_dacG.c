@@ -1810,39 +1810,6 @@ static const struct mgag_i2c_private {
     { (1 << 1), (1 << 0) },  /* G200EH, G200ER I2C bits */
 };
 
-
-static unsigned int
-MGAG_ddc1Read(ScrnInfoPtr pScrn)
-{
-  MGAPtr pMga = MGAPTR(pScrn);
-  unsigned char val;
-  int i2c_index;
-
-  if (pMga->is_G200SE || pMga->is_G200WB || pMga->is_G200EV)
-    i2c_index = 3;
-  else if (pMga->is_G200EH || pMga->is_G200ER)
-    i2c_index = 4;
-  else
-    i2c_index = 0;
-
-  const struct mgag_i2c_private *p = & i2c_priv[i2c_index];
- 
-  /* Define the SDA as an input */
-  outMGAdacmsk(MGA1064_GEN_IO_CTL, ~(p->scl_mask | p->sda_mask), 0);
-
-  /* wait for Vsync */
-  if (pMga->is_G200SE) {
-    usleep(4);
-  } else {
-    while( INREG( MGAREG_Status ) & 0x08 );
-    while( ! (INREG( MGAREG_Status ) & 0x08) );
-  }
-
-  /* Get the result */
-  val = (inMGAdac(MGA1064_GEN_IO_DATA) & p->sda_mask);
-  return val;
-}
-
 static void
 MGAG_I2CGetBits(I2CBusPtr b, int *clock, int *data)
 {
@@ -2046,14 +2013,6 @@ void MGAGSetupFuncs(ScrnInfoPtr pScrn)
     pMga->Save = MGAGSave;
     pMga->Restore = MGAGRestore;
     pMga->ModeInit = MGAGInit;
-    if ((!pMga->is_G200WB) && (!pMga->is_G200ER)) {
-        pMga->ddc1Read = MGAG_ddc1Read;
-        /* vgaHWddc1SetSpeed will only work if the card is in VGA mode */
-        pMga->DDC1SetSpeed = vgaHWddc1SetSpeedWeak();
-    } else {
-        pMga->ddc1Read = NULL;
-        pMga->DDC1SetSpeed = NULL;
-    }
     pMga->i2cInit = MGAG_i2cInit;
 }
 
