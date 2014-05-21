@@ -1750,7 +1750,13 @@ MGAPreInit(ScrnInfoPtr pScrn, int flags)
      */
 
     /* Prefer 32bpp */
-    flags24 = Support24bppFb | Support32bppFb | PreferConvert24to32;
+    flags24 = Support24bppFb | Support32bppFb;
+
+    /* Prefer 24bpp on the bandwidth-poor SE-A, sigh */
+    if (pMga->Chipset == PCI_CHIP_MGAG200_SE_A_PCI)
+	flags24 |= SupportConvert32to24 | PreferConvert32to24;
+    else
+	flags24 |= PreferConvert24to32;
 
     if (pMga->SecondCrtc)
 	flags24 = Support32bppFb;
